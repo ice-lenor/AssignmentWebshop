@@ -1,0 +1,108 @@
+﻿@model IEnumerable<AssignmentWebshop.Models.Product>
+
+@{
+	ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+	@Html.ActionLink("Create New", "Create")
+</p>
+<p>
+	@*function openAttachment() {
+		document.getElementById('attachement').click();
+	}
+
+	function fileSelected(input){
+		document.getElementById('btnAttachment').value = "File: " + input.files[0].name
+	}
+
+	<input type="file" class="file" id="attachement" name="attachement" style="display: none;" onchange="fileSelected(this)" />
+	<input type="button" class="file" id="btnAttachment" onclick="openAttachment()" value="File" />*@
+
+	<input type="file" id="input" value="Import products from .csv" onchange="parseProductsFile(this.files[0])">
+</p>
+<table class="table">
+	<tr>
+		<th>
+			@Html.DisplayNameFor(model => model.ProductName)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.ArticleCode)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.ProductType)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Manufacturer)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Price)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.DiscountPrice)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.DeliveryRange)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.PersonType)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Size)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Color)
+		</th>
+		<th></th>
+	</tr>
+
+	@foreach (var item in Model)
+	{
+		<tr>
+			<td>
+				@Html.DisplayFor(modelItem => item.ProductName)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.ArticleCode)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.ProductType.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Manufacturer.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Price)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DiscountPrice)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.DeliveryRange.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.PersonType.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Size.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Color.Name)
+			</td>
+			<td>
+				@Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+				@Html.ActionLink("Details", "Details", new { id = item.Id }) |
+				@Html.ActionLink("Delete", "Delete", new { id = item.Id })
+			</td>
+		</tr>
+	}
+
+</table>
+
+
+@section Scripts {
+	@Scripts.Render("~/Scripts/parseProductsFile.js")
+	@Scripts.Render("https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.6/papaparse.min.js")
+}
