@@ -1,5 +1,4 @@
-﻿
-function parseProductsFile(file) {
+﻿function parseProductsFile(file) {
     Papa.parse(file, {
         //worker: true, // workers don't work in local chrome?.. see https://stackoverflow.com/questions/21408510/chrome-cant-load-web-worker
         header: true,

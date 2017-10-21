@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using AssignmentWebshop.Models;
+using AssignmentWebshop.ProductImport;
 
 namespace AssignmentWebshop.Controllers
 {
@@ -42,19 +43,21 @@ namespace AssignmentWebshop.Controllers
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public ActionResult Create([Bind(Include = "Id,ProductName,ArticleCode,Price,DiscountPrice")] Product product)
+        public ActionResult Create(ProductRaw productRaw)
         {
             if (ModelState.IsValid)
             {
-                db.Products.Add(product);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                ProductRawToProductConverter converter = new ProductRawToProductConverter(db);
+                Product product = converter.Convert(productRaw);
+                if (product != null) {
+                    db.Products.Add(product);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
 
-            return View(product);
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
         // GET: Products/Edit/5

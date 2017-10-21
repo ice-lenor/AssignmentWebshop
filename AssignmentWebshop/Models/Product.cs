@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace AssignmentWebshop.Models
 {
@@ -41,45 +38,57 @@ namespace AssignmentWebshop.Models
         public virtual Color Color { get; set; } // maps to "color"
     }
 
-    public class ProductType
+    public interface INamedCollection
+    {
+        int Id { get; }
+        String Name { get; set; }
+    }
+
+    public class ProductType : INamedCollection
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 
-    public class Manufacturer
+    public class Manufacturer : INamedCollection
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 
-    public class DeliveryRange
+    public class DeliveryRange : INamedCollection
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 
-    public class PersonType // bad name
+    public class PersonType : INamedCollection // bad name
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 
-    public class Size
+    public class Size : INamedCollection
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 
-    public class Color
+    public class Color : INamedCollection
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public String Name { get; set; }
     }
 

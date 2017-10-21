@@ -5,7 +5,7 @@
     var product = {};
 
     product.ProductName = csvRow.Key;
-    product.Article = csvRow.Artikelcode;
+    product.ArticleCode = csvRow.Artikelcode;
     product.ProductType = csvRow.colorcode;
     product.Manufacturer = csvRow.description;
     product.Price = csvRow.price;
