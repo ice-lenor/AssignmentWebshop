@@ -6813,4 +6813,9 @@ td.visible-print {
   td.hidden-print {
     display: none !important;
   }
+
+  .prev-next-links {
+    padding: 15px 15px;
+  }
+
 }

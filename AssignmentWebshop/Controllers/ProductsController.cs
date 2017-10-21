@@ -1,45 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using AssignmentWebshop.Models;
 using AssignmentWebshop.ProductImport;
 
 namespace AssignmentWebshop.Controllers
 {
+    /// <summary>
+    /// Controller: the set of http-endpoints for managing the products
+    /// </summary>
     public class ProductsController : Controller
     {
+        const int PageSize = 10;
+
         private ProductDBContext db = new ProductDBContext();
 
         // GET: Products
-        public ActionResult Index()
+        // GET: Products/startIndex=5
+        public ActionResult Index(int? startIndex)
         {
-            return View(db.Products.Take(10).ToList());
-        }
-
-        // GET: Products/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
-
-        // GET: Products/Create
-        public ActionResult Create()
-        {
-            return View();
+            if (startIndex == null) startIndex = 0;
+            return View(db.Products.OrderBy(x => x.Id).Skip(startIndex.Value).Take(PageSize).ToList());
         }
 
         // POST: Products/Create
@@ -53,67 +35,11 @@ namespace AssignmentWebshop.Controllers
                 if (product != null) {
                     db.Products.Add(product);
                     db.SaveChanges();
-                    return RedirectToAction("Index");
+                    return new HttpStatusCodeResult(HttpStatusCode.OK);
                 }
             }
 
             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-        }
-
-        // GET: Products/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
-
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        public ActionResult Edit([Bind(Include = "Id,ProductName,ArticleCode,Price,DiscountPrice")] Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(product).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(product);
-        }
-
-        // GET: Products/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
-
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Product product = db.Products.Find(id);
-            db.Products.Remove(product);
-            db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

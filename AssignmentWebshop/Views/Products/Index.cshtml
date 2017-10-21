@@ -1,26 +1,12 @@
 ﻿@model IEnumerable<AssignmentWebshop.Models.Product>
 
 @{
-	ViewBag.Title = "Index";
+	ViewBag.Title = "Products";
 }
 
-<h2>Index</h2>
+<h2>Products</h2>
 
 <p>
-	@Html.ActionLink("Create New", "Create")
-</p>
-<p>
-	@*function openAttachment() {
-		document.getElementById('attachement').click();
-	}
-
-	function fileSelected(input){
-		document.getElementById('btnAttachment').value = "File: " + input.files[0].name
-	}
-
-	<input type="file" class="file" id="attachement" name="attachement" style="display: none;" onchange="fileSelected(this)" />
-	<input type="button" class="file" id="btnAttachment" onclick="openAttachment()" value="File" />*@
-
 	<input type="file" id="input" value="Import products from .csv" onchange="parseProductsFile(this.files[0])">
 </p>
 <table class="table">
@@ -100,6 +86,33 @@
 	}
 
 </table>
+
+<p>
+	@{
+		const int pageSize = 10;
+		int startIndex = 0;
+		String startIndexStr = Request.Params["startIndex"];
+		if (startIndexStr != null)
+		{
+			int.TryParse(Request.Params["startIndex"], out startIndex);
+		}
+
+		if (startIndex > 0) {
+			@Html.ActionLink("Previous page", "", new
+			{
+				startIndex = startIndex - pageSize
+			}, new { @class = "prev-next-links" })
+		}
+
+		if (Model.Count() >= pageSize)
+		{
+			@Html.ActionLink("Next page", "", new
+			{
+				startIndex = startIndex + pageSize
+			}, new { @class = "prev-next-links" })
+		}
+	}
+</p>
 
 
 @section Scripts {
