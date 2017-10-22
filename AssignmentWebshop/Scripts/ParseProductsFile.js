@@ -13,6 +13,8 @@ const bulk_post_size = 100;
 // sends batch post-requests to the backend to create the products,
 // and shows the message to the user: success / failure.
 function parseProductsFile(file) {
+    showPleaseWait();
+
     all_parsed = false;
     all_requests = 0;
     finished_requests = 0;
@@ -108,12 +110,14 @@ function createProductsBatch() {
 
 // Show an "import succeeded" message
 function onAllImportSuccess() {
+    hidePleaseWait();
     alert("The products from the file have been imported. \nSuccessfully created " + import_successful + " products.\nFailed to create products from " + import_failed + " rows.");
     location.reload();
 }
 
 // Show an "import failed" message
 function onAllImportFailure() {
+    hidePleaseWait();
     alert("Sorry, couldn't import products from the file.\nIt is possible the file is invalid or empty.");
     location.reload();
 }

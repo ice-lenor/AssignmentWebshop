@@ -15,7 +15,7 @@ namespace AssignmentWebshop.Controllers
     {
         const int PageSize = 100;
 
-        private ProductDBContext db = new ProductDBContext();
+        private ProductDBContext m_db = new ProductDBContext();
 
         // GET: Products
         // GET: Products/startIndex=5
@@ -23,8 +23,8 @@ namespace AssignmentWebshop.Controllers
         {
             if (startIndex == null) startIndex = 0;
 
-            var products = db.Products.OrderBy(x => x.Id).Skip(startIndex.Value).Take(PageSize).ToList();
-            int productsTotalCount = db.Products.Count();
+            var products = m_db.Products.OrderBy(x => x.Id).Skip(startIndex.Value).Take(PageSize).ToList();
+            int productsTotalCount = m_db.Products.Count();
             int currentPage = (int)(startIndex / PageSize) + 1;
             int pagesTotalCount = (productsTotalCount / PageSize) + 1;
             var productsPage = new ProductsPage(products, currentPage, pagesTotalCount, productsTotalCount);
@@ -43,7 +43,9 @@ namespace AssignmentWebshop.Controllers
         {
             if (ModelState.IsValid)
             {
-                ProductRawToProductConverter converter = new ProductRawToProductConverter(db);
+                // convert all products to valid model objects ready to be saved
+                var dictionaryCache = new DictionaryCache(m_db);
+                ProductRawToProductConverter converter = new ProductRawToProductConverter(m_db, dictionaryCache);
                 var successfulCount = 0;
                 var failedCount = 0;
                 foreach (var productRaw in products)
@@ -51,7 +53,7 @@ namespace AssignmentWebshop.Controllers
                     Product parsedProduct = converter.Convert(productRaw);
                     if (parsedProduct != null)
                     {
-                        db.Products.Add(parsedProduct);
+                        m_db.Products.Add(parsedProduct);
                         ++successfulCount;
                     }
                     else
@@ -62,7 +64,8 @@ namespace AssignmentWebshop.Controllers
 
                 if (successfulCount > 0)
                 {
-                    db.SaveChanges();
+                    // save products
+                    m_db.SaveChanges();
                     return Json(new { successfulCount = successfulCount, failedCount = failedCount });
                 }
             }
@@ -75,7 +78,7 @@ namespace AssignmentWebshop.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                m_db.Dispose();
             }
             base.Dispose(disposing);
         }

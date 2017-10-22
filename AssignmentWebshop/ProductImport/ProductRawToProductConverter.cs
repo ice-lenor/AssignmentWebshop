@@ -1,8 +1,6 @@
 ﻿using AssignmentWebshop.Models;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
+using System.Threading;
 
 namespace AssignmentWebshop.ProductImport
 {
@@ -12,13 +10,15 @@ namespace AssignmentWebshop.ProductImport
     /// </summary>
     public class ProductRawToProductConverter
     {
-        ProductDBContext m_db;
-        Dictionary<String, Dictionary<String, int>> m_dictionaryValues;
+        static ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
 
-        public ProductRawToProductConverter(ProductDBContext db)
+        ProductDBContext m_db;
+        IDictionaryCache m_dictionaryCache;
+
+        public ProductRawToProductConverter(ProductDBContext db, IDictionaryCache dictionaryCache)
         {
             m_db = db;
-            m_dictionaryValues = new Dictionary<string, Dictionary<string, int>>();
+            m_dictionaryCache = dictionaryCache;
         }
 
         /// <summary>
@@ -47,13 +47,17 @@ namespace AssignmentWebshop.ProductImport
 
             Product result = new Product();
 
+            if (productRaw.ProductName.Length >= 150)
+                return null;
             result.ProductName = productRaw.ProductName;
 
+            if (productRaw.ProductName.Length >= 150)
+                return null;
             result.ArticleCode = productRaw.ArticleCode;
 
-            result.ProductTypeId = GetIdInDictionary<ProductType>(productRaw.ProductType, m_db.ProductTypes);
+            result.ProductTypeId = m_dictionaryCache.GetIdInDictionary<ProductType>(productRaw.ProductType, m_db.ProductTypes);
 
-            result.ManufacturerId = GetIdInDictionary<Manufacturer>(productRaw.Manufacturer, m_db.Manufacturers);
+            result.ManufacturerId = m_dictionaryCache.GetIdInDictionary<Manufacturer>(productRaw.Manufacturer, m_db.Manufacturers);
 
             try
             {
@@ -84,61 +88,17 @@ namespace AssignmentWebshop.ProductImport
             catch (OverflowException)
             { }
 
-            result.DeliveryRangeId = GetIdInDictionary<DeliveryRange>(productRaw.DeliveryRange, m_db.DeliveryRanges);
+            result.DeliveryRangeId = m_dictionaryCache.GetIdInDictionary<DeliveryRange>(productRaw.DeliveryRange, m_db.DeliveryRanges);
 
-            result.PersonTypeId = GetIdInDictionary<PersonType>(productRaw.PersonType, m_db.PersonTypes);
+            result.PersonTypeId = m_dictionaryCache.GetIdInDictionary<PersonType>(productRaw.PersonType, m_db.PersonTypes);
 
-            result.SizeId = GetIdInDictionary<Size>(productRaw.Size, m_db.Sizes);
+            result.SizeId = m_dictionaryCache.GetIdInDictionary<Size>(productRaw.Size, m_db.Sizes);
 
-            result.ColorId = GetIdInDictionary<Color>(productRaw.Color, m_db.Colors);
+            result.ColorId = m_dictionaryCache.GetIdInDictionary<Color>(productRaw.Color, m_db.Colors);
 
             return result;
         }
 
-        /// <summary>
-        /// Gets the dictionary id by its name.
-        /// If the value exists, returns its id.
-        /// If the value doesn't exist, creates it in the database and then returns its id.
-        /// </summary>
-        /// <typeparam name="T">Type of value in a dictionary</typeparam>
-        /// <param name="valueRaw">String name of the dictionary item</param>
-        /// <param name="dbCollection">Collection of dictionary values</param>
-        /// <returns>Id of the dictionary item</returns>
-        private int? GetIdInDictionary<T>(String valueRaw, DbSet<T> dbCollection)
-            where T : class, INamedDictionary, new()
-        {
-            if (String.IsNullOrEmpty(valueRaw))
-                return null;
-
-            // first try to get the dictionary value by name from cache
-
-            // if this collection is not cached yet, let's cache it
-            var collectionName = typeof(T).Name;
-            if (!m_dictionaryValues.ContainsKey(collectionName))
-            {
-                m_dictionaryValues.Add(collectionName, dbCollection.ToDictionary(x => x.Name, x => x.Id));
-            }
-
-            // now check if there is value in cache
-            var currentCollectionValues = m_dictionaryValues[collectionName];
-
-            // if value is present, return the id
-            if (currentCollectionValues.ContainsKey(valueRaw))
-                return currentCollectionValues[valueRaw];
-
-            // if value is not in cache, we need to create it in the database
-            T valueToCreate = new T() { Name = valueRaw };
-            var valueDb = dbCollection.Add(valueToCreate);
-            m_db.SaveChanges();
-
-            // and then cache it and return it
-            if (valueDb != null)
-            {
-                currentCollectionValues.Add(valueRaw, valueDb.Id);
-                return valueDb.Id;
-            }
-
-            return null;
-        }
+        
     }
 }

@@ -16,11 +16,13 @@ namespace AssignmentWebshop.Models
         /// <summary>
         /// Name of the product
         /// </summary>
+        [StringLength(150)]
         public String ProductName { get; set; } // maps to "Key"
 
         /// <summary>
         /// Article code of the product
         /// </summary>
+        [StringLength(150)]
         public String ArticleCode { get; set; } // maps to "Artikelcode"
 
         /// <summary>
@@ -31,7 +33,7 @@ namespace AssignmentWebshop.Models
         /// <summary>
         /// Type of the product
         /// </summary>
-        public virtual ProductType ProductType { get; set; } // maps to "colorcode" - why "color" at all?
+        public virtual ProductType ProductType { get; set; } // maps to "colorcode" - why "color" at all here?
 
         /// <summary>
         /// Manufacturer of the product
@@ -113,6 +115,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
@@ -124,6 +128,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
@@ -135,6 +141,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
@@ -146,6 +154,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
@@ -157,6 +167,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
@@ -168,6 +180,8 @@ namespace AssignmentWebshop.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(50)]
+        [Index(IsUnique = true)]
         public String Name { get; set; }
     }
 
