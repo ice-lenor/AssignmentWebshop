@@ -74,6 +74,7 @@ namespace AssignmentWebshop.ProductImport
 
                         T valueToCreate = new T() { Name = valueRaw };
                         var valueDb = dbCollection.Add(valueToCreate);
+                        m_db.ChangeTracker.DetectChanges();
                         m_db.SaveChanges();
                     }
                     catch (DbUpdateException)

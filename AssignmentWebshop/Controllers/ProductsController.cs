@@ -45,6 +45,9 @@ namespace AssignmentWebshop.Controllers
             if (ModelState.IsValid && products != null)
             {
                 // convert all products to valid model objects ready to be saved
+
+                m_db.Configuration.AutoDetectChangesEnabled = false;
+
                 var dictionaryCache = new DictionaryCache(m_db);
                 var productValidator = new ProductValidator();
                 ProductRawToProductConverter converter = new ProductRawToProductConverter(dictionaryCache, productValidator);
@@ -67,6 +70,7 @@ namespace AssignmentWebshop.Controllers
                 if (successfulCount > 0)
                 {
                     // save products
+                    m_db.ChangeTracker.DetectChanges();
                     m_db.SaveChanges();
                     return Json(new { successfulCount = successfulCount, failedCount = failedCount });
                 }

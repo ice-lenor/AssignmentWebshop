@@ -52,8 +52,10 @@ There is no localization of strings in user interface.
 
 The uploaded dictionary entries are not multilingual; which means that if we upload two entries with "groen" and "green" colors, there will be two separate color entries.
 
-I also didn't have time to write any tests. But if I had, I would use a mocking framework, for example, RhinoMocks, which would help me make mocks for interfaces I created. This way, I would be able to unit-test ProductRawToProductConverter, the whole validation mechanism (individual validations and the whole ProductValidator), and perhaps after some tweaks - the DictionaryCache.
+I didn't have time to write any tests. But if I had, I would use a mocking framework, for example, RhinoMocks, which would help me make mocks for interfaces I created. This way, I would be able to unit-test ProductRawToProductConverter, the whole validation mechanism (individual validations and the whole ProductValidator), and perhaps after some tweaks - the DictionaryCache.
 A real production system could ask for integration tests: we could write some automated tests for the REST api; and perhaps UI tests as well.
+
+I didn't have time to profile the application. The requirements didn't state the acceptable speed and memory consumption. It will work, but perhaps not as fast as it could have been.
 
 Finally, please excuse some bootstrap code: it is remnants of the default MVC-project which Visual Studio creates by default.
 

@@ -7,7 +7,7 @@ var import_failed = 0
 
 var products = []
 
-const bulk_post_size = 100;
+const bulk_post_size = 1000;
 
 // Parses the csv-file with products,
 // sends batch post-requests to the backend to create the products,

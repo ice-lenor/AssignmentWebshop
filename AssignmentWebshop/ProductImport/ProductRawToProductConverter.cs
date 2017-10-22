@@ -62,34 +62,40 @@ namespace AssignmentWebshop.ProductImport
 
             result.ManufacturerId = m_dictionaryCache.GetIdInDictionary<Manufacturer>(productRaw.Manufacturer);
 
-            try
+            if (productRaw.Price != null)
             {
-                // If the price number is incorrect, we'll skip it.
-                // Besides, there is a question which currency does the price come in.
-                Decimal price = Decimal.Parse(productRaw.Price);
-                result.Price = price;
+                try
+                {
+                    // If the price number is incorrect, we'll skip it.
+                    // Besides, there is a question which currency does the price come in.
+                    Decimal price = Decimal.Parse(productRaw.Price);
+                    result.Price = price;
+                }
+                catch (ArgumentNullException)
+                { }
+                catch (FormatException)
+                { }
+                catch (OverflowException)
+                { }
             }
-            catch (ArgumentNullException)
-            { }
-            catch (FormatException)
-            { }
-            catch (OverflowException)
-            { }
 
-            try
+            if (productRaw.DiscountPrice != null)
             {
-                // Same for correctness of the format of this price.
-                // Besides, in a real production system we probably would like to check if the discount price is less
-                // than the original price, and display a validation error to the user in case it's not.
-                Decimal discountPrice = Decimal.Parse(productRaw.DiscountPrice);
-                result.DiscountPrice = discountPrice;
+                try
+                {
+                    // Same for correctness of the format of this price.
+                    // Besides, in a real production system we probably would like to check if the discount price is less
+                    // than the original price, and display a validation error to the user in case it's not.
+                    Decimal discountPrice = Decimal.Parse(productRaw.DiscountPrice);
+                    result.DiscountPrice = discountPrice;
+                }
+                catch (ArgumentNullException)
+                { }
+                catch (FormatException)
+                { }
+                catch (OverflowException)
+                { }
             }
-            catch (ArgumentNullException)
-            { }
-            catch (FormatException)
-            { }
-            catch (OverflowException)
-            { }
 
             result.DeliveryRangeId = m_dictionaryCache.GetIdInDictionary<DeliveryRange>(productRaw.DeliveryRange);
 
