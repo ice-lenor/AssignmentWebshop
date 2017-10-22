@@ -13,7 +13,7 @@ namespace AssignmentWebshop.Controllers
     /// </summary>
     public class ProductsController : Controller
     {
-        const int PageSize = 10;
+        const int PageSize = 100;
 
         private ProductDBContext db = new ProductDBContext();
 
@@ -22,7 +22,19 @@ namespace AssignmentWebshop.Controllers
         public ActionResult Index(int? startIndex)
         {
             if (startIndex == null) startIndex = 0;
-            return View(db.Products.OrderBy(x => x.Id).Skip(startIndex.Value).Take(PageSize).ToList());
+
+            var products = db.Products.OrderBy(x => x.Id).Skip(startIndex.Value).Take(PageSize).ToList();
+            int productsTotalCount = db.Products.Count();
+            int currentPage = (int)(startIndex / PageSize) + 1;
+            int pagesTotalCount = (productsTotalCount / PageSize) + 1;
+            var productsPage = new ProductsPage(products, currentPage, pagesTotalCount, productsTotalCount);
+            if (startIndex > 0)
+                productsPage.PreviousPageProductIndex = startIndex - PageSize;
+
+            if (startIndex + PageSize < productsTotalCount)
+                productsPage.NextPageProductIndex = startIndex + PageSize;
+
+            return View(productsPage);
         }
 
         // POST: Products/Create

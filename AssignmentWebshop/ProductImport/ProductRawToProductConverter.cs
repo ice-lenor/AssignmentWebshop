@@ -1,20 +1,24 @@
 ﻿using AssignmentWebshop.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
 namespace AssignmentWebshop.ProductImport
 {
     /// <summary>
-    /// Converts the product from a raw value, coming from user input,
-    /// to a valid product object.
+    /// Converts the product from a <see cref="ProductRaw"/> raw value, coming from user input,
+    /// to a valid <see cref="Product"/> product object.
     /// </summary>
     public class ProductRawToProductConverter
     {
         ProductDBContext m_db;
+        Dictionary<String, Dictionary<String, int>> m_dictionaryValues;
+
         public ProductRawToProductConverter(ProductDBContext db)
         {
             m_db = db;
+            m_dictionaryValues = new Dictionary<string, Dictionary<string, int>>();
         }
 
         /// <summary>
@@ -101,22 +105,38 @@ namespace AssignmentWebshop.ProductImport
         /// <param name="dbCollection">Collection of dictionary values</param>
         /// <returns>Id of the dictionary item</returns>
         private int? GetIdInDictionary<T>(String valueRaw, DbSet<T> dbCollection)
-            where T : class, INamedCollection, new()
+            where T : class, INamedDictionary, new()
         {
             if (String.IsNullOrEmpty(valueRaw))
                 return null;
 
-            // first try to get the dictionary value by name from the database
-            T valueDb = dbCollection.FirstOrDefault(x => x.Name == valueRaw);
-            if (valueDb == null)
+            // first try to get the dictionary value by name from cache
+
+            // if this collection is not cached yet, let's cache it
+            var collectionName = typeof(T).Name;
+            if (!m_dictionaryValues.ContainsKey(collectionName))
             {
-                T valueToCreate = new T() { Name = valueRaw };
-                valueDb = dbCollection.Add(valueToCreate);
-                m_db.SaveChanges();
+                m_dictionaryValues.Add(collectionName, dbCollection.ToDictionary(x => x.Name, x => x.Id));
             }
 
+            // now check if there is value in cache
+            var currentCollectionValues = m_dictionaryValues[collectionName];
+
+            // if value is present, return the id
+            if (currentCollectionValues.ContainsKey(valueRaw))
+                return currentCollectionValues[valueRaw];
+
+            // if value is not in cache, we need to create it in the database
+            T valueToCreate = new T() { Name = valueRaw };
+            var valueDb = dbCollection.Add(valueToCreate);
+            m_db.SaveChanges();
+
+            // and then cache it and return it
             if (valueDb != null)
+            {
+                currentCollectionValues.Add(valueRaw, valueDb.Id);
                 return valueDb.Id;
+            }
 
             return null;
         }

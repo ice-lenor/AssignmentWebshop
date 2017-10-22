@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AssignmentWebshop.Models.Product>
+﻿@model AssignmentWebshop.Models.ProductsPage
 
 @{
 	ViewBag.Title = "Products";
@@ -10,42 +10,76 @@
 	<label for="file">Choose a .csv file to upload products</label>
 	<input type="file" id="input" value="Import products from .csv" accept=".csv" onchange="parseProductsFile(this.files[0])">
 </p>
+
+<hr />
+
+<p>
+	<label>
+		Total products count:
+		@Model.ProductsTotalCount
+	</label>
+</p>
+
+<p>
+	<label>Current page: @Model.PageNumber / @Model.PagesTotalCount</label>
+<p>
+<p class=".prev-next-block">
+	@{
+		if (Model.PreviousPageProductIndex != null)
+		{
+			@Html.ActionLink("Previous page", "", new
+			   {
+				   startIndex = Model.PreviousPageProductIndex
+			   }, new { @class = "prev-link" })
+		}
+
+		if (Model.NextPageProductIndex != null)
+		{
+			@Html.ActionLink("Next page", "", new
+			   {
+				   startIndex = Model.NextPageProductIndex
+			   }, new { @class = "next-link" })
+		}
+	}
+</p>
+
+
 <table class="table">
 	<tr>
 		<th>
-			@Html.DisplayNameFor(model => model.ProductName)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().ProductName)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.ArticleCode)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().ArticleCode)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.ProductType)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().ProductType)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.Manufacturer)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().Manufacturer)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.Price)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().Price)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.DiscountPrice)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().DiscountPrice)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.DeliveryRange)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().DeliveryRange)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.PersonType)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().PersonType)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.Size)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().Size)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.Color)
+			@Html.DisplayNameFor(model => model.CurrentProducts.First().Color)
 		</th>
 		<th></th>
 	</tr>
 
-	@foreach (var item in Model)
+	@foreach (var item in Model.CurrentProducts)
 	{
 		<tr>
 			<td>
@@ -82,33 +116,6 @@
 	}
 
 </table>
-
-<p>
-	@{
-		const int pageSize = 10;
-		int startIndex = 0;
-		String startIndexStr = Request.Params["startIndex"];
-		if (startIndexStr != null)
-		{
-			int.TryParse(Request.Params["startIndex"], out startIndex);
-		}
-
-		if (startIndex > 0) {
-			@Html.ActionLink("Previous page", "", new
-			{
-				startIndex = startIndex - pageSize
-			}, new { @class = "prev-link" })
-		}
-
-		if (Model.Count() >= pageSize)
-		{
-			@Html.ActionLink("Next page", "", new
-			{
-				startIndex = startIndex + pageSize
-			}, new { @class = "next-link" })
-		}
-	}
-</p>
 
 
 @section Scripts {

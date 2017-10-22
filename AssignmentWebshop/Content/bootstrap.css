@@ -6815,6 +6815,11 @@ td.visible-print {
   }
 }
 
+.prev-next-block {
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
 .prev-link {
   margin-right: 15px;
 }

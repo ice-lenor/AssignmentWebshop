@@ -200,6 +200,7 @@
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ProductsPage.cs" />
     <Compile Include="ProductImport\ProductRaw.cs" />
     <Compile Include="ProductImport\ProductRawToProductConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
