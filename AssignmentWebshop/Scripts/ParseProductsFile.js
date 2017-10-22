@@ -9,9 +9,8 @@
             }
         },
 
-        complete: function() {
-            console.log("All done!");
-            alert("The file has been imported");
+        complete: function () {
+            all_parsed = true;
         }
     });
 

@@ -1,4 +1,8 @@
-﻿function createProduct(csvRow) {
+﻿var all_parsed = false;
+var all_products = 0
+var created_products = 0
+
+function createProduct(csvRow) {
 
     console.log(csvRow)
 
@@ -15,16 +19,24 @@
     product.Size = csvRow.size;
     product.Color = csvRow.color;
 
-    console.log(product)
+    console.log(product);
+
+    ++all_products;
+
+    $( document ).ajaxComplete(function () {
+        console.log("ajaxComplete");
+        ++created_products;
+
+        if (all_parsed && created_products == all_products) {
+            alert("The file has been successfully imported");
+            location.reload();
+        }
+    });
 
     $.ajax({
         type: "POST",
         url: '/Products/Create',
-        data: product, //Maps the controller params
-        dataType: "json",
-        success: function (result) { alert("success" + result); },
-        failure: function (result) { alert("failure" + result); }
+        data: product, // Maps the controller params
+        dataType: "json"
     });
-
-    
 }
