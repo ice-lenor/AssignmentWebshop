@@ -1,4 +1,6 @@
-﻿function createProduct(csvRow) {
+﻿var products = []
+
+function createProductFromCsvRow(csvRow) {
     var product = {};
 
     product.ProductName = csvRow.Key;
@@ -12,20 +14,6 @@
     product.Size = csvRow.size;
     product.Color = csvRow.color;
 
-    ++all_products;
+    return product;
 
-    $( document ).ajaxComplete(function () {
-        ++created_products;
-
-        if (all_parsed && created_products == all_products) {
-            onAllImportSuccess();
-        }
-    });
-
-    $.ajax({
-        type: "POST",
-        url: '/Products/Create',
-        data: product, // Maps the controller params
-        dataType: "json"
-    });
 }

@@ -29,7 +29,16 @@ namespace AssignmentWebshop.ProductImport
             // for example, that the delivery dates are valid;
             // that all dictionary entries already exist;
             // or that the article code is always set up and comes in a given format.
-            // For the purpose of the "test exercise", and not knowing a lot about the data,
+
+            // In a real production system, we could, for example:
+            // - log an error and fire an alert for the user
+            // - log to a special table "parsing problems" and offer to the user to fix all problems afterwards
+            // - or offer the user to fix the error right away;
+            // - skip the whole entry
+            // - or save the whole entry without the errorneous field (like we do now).
+
+            // Because it is a "test exercise",
+            // and because there's almost no information about the customer, their domain area, and the data itself,
             // we validate almost nothing.
 
             Product result = new Product();
@@ -45,13 +54,6 @@ namespace AssignmentWebshop.ProductImport
             try
             {
                 // If the price number is incorrect, we'll skip it.
-                // For a real production system, we could, for example:
-                // - log it and fire an alert
-                // - log to a special table "parsing problems" and offer to the user to fix all problems afterwards
-                // - or offer the user to fix the price right away;
-                // - skip the whole entry
-                // - or save the whole entry without price (like we do now).
-
                 // Besides, there is a question which currency does the price come in.
                 Decimal price = Decimal.Parse(productRaw.Price);
                 result.Price = price;

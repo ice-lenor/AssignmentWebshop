@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Mvc;
 using AssignmentWebshop.Models;
 using AssignmentWebshop.ProductImport;
+using System.Collections.Generic;
 
 namespace AssignmentWebshop.Controllers
 {
@@ -26,14 +27,24 @@ namespace AssignmentWebshop.Controllers
 
         // POST: Products/Create
         [HttpPost]
-        public ActionResult Create(ProductRaw productRaw)
+        public ActionResult Create(IEnumerable<ProductRaw> products)
         {
             if (ModelState.IsValid)
             {
                 ProductRawToProductConverter converter = new ProductRawToProductConverter(db);
-                Product product = converter.Convert(productRaw);
-                if (product != null) {
-                    db.Products.Add(product);
+                var atLeastOne = false;
+                foreach (var productRaw in products)
+                {
+                    Product parsedProduct = converter.Convert(productRaw);
+                    if (parsedProduct != null)
+                    {
+                        db.Products.Add(parsedProduct);
+                        atLeastOne = true;
+                    }
+                }
+
+                if (atLeastOne)
+                {
                     db.SaveChanges();
                     return new HttpStatusCodeResult(HttpStatusCode.OK);
                 }
