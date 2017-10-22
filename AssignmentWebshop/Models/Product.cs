@@ -184,16 +184,4 @@ namespace AssignmentWebshop.Models
         [Index(IsUnique = true)]
         public String Name { get; set; }
     }
-
-    public class ProductDBContext : DbContext
-    {
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductType> ProductTypes { get; set; }
-        public DbSet<Manufacturer> Manufacturers { get; set; }
-
-        public DbSet<DeliveryRange> DeliveryRanges { get; set; }
-        public DbSet<PersonType> PersonTypes { get; set; }
-        public DbSet<Size> Sizes { get; set; }
-        public DbSet<Color> Colors { get; set; }
-    }
 }

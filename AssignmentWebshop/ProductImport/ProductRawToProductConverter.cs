@@ -1,4 +1,5 @@
 ﻿using AssignmentWebshop.Models;
+using AssignmentWebshop.ProductImport.ProductValidations;
 using System;
 using System.Threading;
 
@@ -11,14 +12,14 @@ namespace AssignmentWebshop.ProductImport
     public class ProductRawToProductConverter
     {
         static ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
-
-        ProductDBContext m_db;
+        
         IDictionaryCache m_dictionaryCache;
+        IProductValidator m_productValidator;
 
-        public ProductRawToProductConverter(ProductDBContext db, IDictionaryCache dictionaryCache)
+        public ProductRawToProductConverter(IDictionaryCache dictionaryCache, IProductValidator validator)
         {
-            m_db = db;
             m_dictionaryCache = dictionaryCache;
+            m_productValidator = validator;
         }
 
         /// <summary>
@@ -45,19 +46,21 @@ namespace AssignmentWebshop.ProductImport
             // and because there's almost no information about the customer, their domain area, and the data itself,
             // we validate almost nothing.
 
+            var validationResults = m_productValidator.Validate(productRaw);
+            if (validationResults != null && validationResults.Count > 0)
+            {
+                return null;
+            }
+
             Product result = new Product();
 
-            if (productRaw.ProductName.Length >= 150)
-                return null;
             result.ProductName = productRaw.ProductName;
 
-            if (productRaw.ProductName.Length >= 150)
-                return null;
             result.ArticleCode = productRaw.ArticleCode;
 
-            result.ProductTypeId = m_dictionaryCache.GetIdInDictionary<ProductType>(productRaw.ProductType, m_db.ProductTypes);
+            result.ProductTypeId = m_dictionaryCache.GetIdInDictionary<ProductType>(productRaw.ProductType);
 
-            result.ManufacturerId = m_dictionaryCache.GetIdInDictionary<Manufacturer>(productRaw.Manufacturer, m_db.Manufacturers);
+            result.ManufacturerId = m_dictionaryCache.GetIdInDictionary<Manufacturer>(productRaw.Manufacturer);
 
             try
             {
@@ -88,17 +91,15 @@ namespace AssignmentWebshop.ProductImport
             catch (OverflowException)
             { }
 
-            result.DeliveryRangeId = m_dictionaryCache.GetIdInDictionary<DeliveryRange>(productRaw.DeliveryRange, m_db.DeliveryRanges);
+            result.DeliveryRangeId = m_dictionaryCache.GetIdInDictionary<DeliveryRange>(productRaw.DeliveryRange);
 
-            result.PersonTypeId = m_dictionaryCache.GetIdInDictionary<PersonType>(productRaw.PersonType, m_db.PersonTypes);
+            result.PersonTypeId = m_dictionaryCache.GetIdInDictionary<PersonType>(productRaw.PersonType);
 
-            result.SizeId = m_dictionaryCache.GetIdInDictionary<Size>(productRaw.Size, m_db.Sizes);
+            result.SizeId = m_dictionaryCache.GetIdInDictionary<Size>(productRaw.Size);
 
-            result.ColorId = m_dictionaryCache.GetIdInDictionary<Color>(productRaw.Color, m_db.Colors);
+            result.ColorId = m_dictionaryCache.GetIdInDictionary<Color>(productRaw.Color);
 
             return result;
         }
-
-        
     }
 }

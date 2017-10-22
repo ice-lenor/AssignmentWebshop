@@ -4,17 +4,15 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 
 namespace AssignmentWebshop.ProductImport
 {
-    public interface IDictionaryCache
-    {
-        int? GetIdInDictionary<T>(String valueRaw, DbSet<T> dbCollection)
-            where T : class, INamedDictionary, new();
-    }
-
+    /// <summary>
+    /// Cache of dictionary values
+    /// </summary>
     public class DictionaryCache : IDictionaryCache
     {
         static ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
@@ -36,7 +34,7 @@ namespace AssignmentWebshop.ProductImport
         /// <param name="valueRaw">String name of the dictionary item</param>
         /// <param name="dbCollection">Collection of dictionary values</param>
         /// <returns>Id of the dictionary item</returns>
-        public int? GetIdInDictionary<T>(String valueRaw, DbSet<T> dbCollection)
+        public int? GetIdInDictionary<T>(String valueRaw)
             where T : class, INamedDictionary, new()
         {
             if (String.IsNullOrEmpty(valueRaw))
@@ -65,17 +63,22 @@ namespace AssignmentWebshop.ProductImport
             locker.EnterWriteLock();
             try
             {
+                var dbCollection = m_db.GetDbSetByItemType<T>();
+                if (dbCollection == null)
+                    return null;
                 if (dbCollection.FirstOrDefault(x => x.Name == valueRaw) == null)
                 {
                     try
                     {
+                        // here could also be a set of validations for dictionary values
+
                         T valueToCreate = new T() { Name = valueRaw };
                         var valueDb = dbCollection.Add(valueToCreate);
                         m_db.SaveChanges();
                     }
                     catch (DbUpdateException)
                     {
-                        // this would mean we already have this entry in the db; great, we'll just refresh the cache then
+                        // this would probably mean we already have this entry in the db; great, we'll just refresh the cache then
                     }
                 }
 

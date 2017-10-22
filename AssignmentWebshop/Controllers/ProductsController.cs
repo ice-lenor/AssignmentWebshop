@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using AssignmentWebshop.Models;
 using AssignmentWebshop.ProductImport;
 using System.Collections.Generic;
+using AssignmentWebshop.ProductImport.ProductValidations;
 
 namespace AssignmentWebshop.Controllers
 {
@@ -41,11 +42,12 @@ namespace AssignmentWebshop.Controllers
         [HttpPost]
         public JsonResult Create(IEnumerable<ProductRaw> products)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && products != null)
             {
                 // convert all products to valid model objects ready to be saved
                 var dictionaryCache = new DictionaryCache(m_db);
-                ProductRawToProductConverter converter = new ProductRawToProductConverter(m_db, dictionaryCache);
+                var productValidator = new ProductValidator();
+                ProductRawToProductConverter converter = new ProductRawToProductConverter(dictionaryCache, productValidator);
                 var successfulCount = 0;
                 var failedCount = 0;
                 foreach (var productRaw in products)
