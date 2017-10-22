@@ -7,7 +7,8 @@
 <h2>Products</h2>
 
 <p>
-	<input type="file" id="input" value="Import products from .csv" onchange="parseProductsFile(this.files[0])">
+	<label for="file">Choose a .csv file to upload products</label>
+	<input type="file" id="input" value="Import products from .csv" accept=".csv" onchange="parseProductsFile(this.files[0])">
 </p>
 <table class="table">
 	<tr>
