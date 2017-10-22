@@ -27,30 +27,36 @@ namespace AssignmentWebshop.Controllers
 
         // POST: Products/Create
         [HttpPost]
-        public ActionResult Create(IEnumerable<ProductRaw> products)
+        public JsonResult Create(IEnumerable<ProductRaw> products)
         {
             if (ModelState.IsValid)
             {
                 ProductRawToProductConverter converter = new ProductRawToProductConverter(db);
-                var atLeastOne = false;
+                var successfulCount = 0;
+                var failedCount = 0;
                 foreach (var productRaw in products)
                 {
                     Product parsedProduct = converter.Convert(productRaw);
                     if (parsedProduct != null)
                     {
                         db.Products.Add(parsedProduct);
-                        atLeastOne = true;
+                        ++successfulCount;
+                    }
+                    else
+                    {
+                        ++failedCount;
                     }
                 }
 
-                if (atLeastOne)
+                if (successfulCount > 0)
                 {
                     db.SaveChanges();
-                    return new HttpStatusCodeResult(HttpStatusCode.OK);
+                    return Json(new { successfulCount = successfulCount, failedCount = failedCount });
                 }
             }
 
-            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            return null;
         }
 
         protected override void Dispose(bool disposing)

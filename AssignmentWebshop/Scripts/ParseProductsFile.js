@@ -1,6 +1,10 @@
 ﻿var all_parsed = false;
 var all_requests = 0;
 var finished_requests = 0;
+
+var import_successful = 0
+var import_failed = 0
+
 var products = []
 
 const bulk_post_size = 100;
@@ -12,11 +16,19 @@ function parseProductsFile(file) {
     all_parsed = false;
     all_requests = 0;
     finished_requests = 0;
+    import_successful = 0;
+    import_failed = 0;
     products = []
 
     // when a post request is finished, this is being executed
-    $(document).ajaxComplete(function () {
+    $(document).ajaxComplete(function (event, xhr, options) {
         ++finished_requests;
+
+        if (xhr.hasOwnProperty("responseJSON") && xhr.responseJSON.hasOwnProperty("successfulCount")
+                && xhr.responseJSON.hasOwnProperty("failedCount")) {
+            import_successful += xhr.responseJSON.successfulCount;
+            import_failed += xhr.responseJSON.failedCount;
+        }
 
         // if the file is fully parsed, and this is the last batch, show the "success" message
         if (all_parsed && finished_requests >= all_requests) {
@@ -51,6 +63,7 @@ function parseOneRow(row) {
             // - or save the whole entry without the errorneous field.
             // Please see a similar comment in ProductImport\ProductRawToProductConverter.cs.
             console.log("Csv row error", row.errors);
+            ++import_failed;
         } else {
             var product = createProductFromCsvRow(row.data["0"]);
             products.push(product);
@@ -95,7 +108,7 @@ function createProductsBatch() {
 
 // Show an "import succeeded" message
 function onAllImportSuccess() {
-    alert("The products from the file have been successfully imported");
+    alert("The products from the file have been imported. \nSuccessfully created " + import_successful + " products.\nFailed to create products from " + import_failed + " rows.");
     location.reload();
 }
 
